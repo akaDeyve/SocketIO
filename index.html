@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <form action="">
+      <input
+        id="m"
+        autocomplete="off"
+        placeholder="Nachricht eingeben..."
+      /><button>Send</button>
+    </form>
+  </body>
+  <script src="script.js"></script>
+  <script src="/socket.io/socket.io.min.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      var socket = io();
+
+      socket.on("user join", function (msg) {
+        var li = document.createElement('li');
+        li.className = 'new-user';
+        li.textContent = "Neuer Nutzer ist dem Server Beigetreten.";
+        document.getElementById('messages').appendChild(li);
+      });
+
+      socket.on("user leave", function (msg) {
+        var li = document.createElement('li');
+        li.className = 'user-left';
+        li.textContent = "Neuer Nutzer hat den Server Verlassen";
+        document.getElementById('messages').appendChild(li);
+      });
+
+      socket.on("chat message", function (msg) {
+        var li = document.createElement('li');
+        li.textContent = msg;
+        document.getElementById('messages').appendChild(li);
+      });
+
+      document.querySelector('form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var messageInput = document.getElementById('m');
+        var message = messageInput.value;
+        socket.emit("chat message", message);
+        messageInput.value = "";
+        return false;
+      });
+    });
+  </script>
+</html>
